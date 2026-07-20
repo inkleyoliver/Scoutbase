@@ -8,6 +8,8 @@ import { StatusPill, PriorityLabel } from "./StatusPill";
 import { CATEGORY_LABELS, EFFORT_LABELS } from "@/lib/constants";
 import { formatShortDate, formatRelativeDue } from "@/lib/date";
 import { markActionDone } from "@/lib/server/actionMutations";
+import StaleBadge from "./StaleBadge";
+import { isStale } from "@/lib/staleness";
 import type { ActionWithSubtasks } from "@/lib/types";
 
 export default function ActionCard({ action }: { action: ActionWithSubtasks }) {
@@ -18,9 +20,11 @@ export default function ActionCard({ action }: { action: ActionWithSubtasks }) {
   const isOverdue = relative?.startsWith("Overdue");
   const doneCount = action.subtasks?.filter((s) => s.done).length ?? 0;
   const totalCount = action.subtasks?.length ?? 0;
+  const stale = isStale(action);
 
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 min-h-[72px]">
+    <div className="flex flex-col gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 min-h-[72px]">
+    <div className="flex items-start gap-3">
       <button
         aria-label="Mark done"
         disabled={pending || action.status === "done"}
@@ -74,6 +78,9 @@ export default function ActionCard({ action }: { action: ActionWithSubtasks }) {
           </div>
         )}
       </Link>
+    </div>
+
+      {stale && <StaleBadge actionId={action.id} />}
     </div>
   );
 }

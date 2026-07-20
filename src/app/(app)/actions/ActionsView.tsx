@@ -6,6 +6,7 @@ import Modal from "@/components/Modal";
 import ActionForm from "@/components/ActionForm";
 import { useFocusMode } from "@/components/FocusModeContext";
 import { FOCUS_MODE_TO_ROLE_KEY, CATEGORY_LABELS, EFFORT_LABELS } from "@/lib/constants";
+import { isStale } from "@/lib/staleness";
 import type { ActionCategory, ActionEffort, ActionWithSubtasks, Milestone } from "@/lib/types";
 
 type StatusFilter = "open_waiting" | "done" | "archived" | "all";
@@ -26,6 +27,13 @@ export default function ActionsView({
   const [milestoneId, setMilestoneId] = useState<string>("");
   const [search, setSearch] = useState("");
   const [showNewModal, setShowNewModal] = useState(false);
+  const [staleOnly, setStaleOnly] = useState(false);
+  const [quickOnly, setQuickOnly] = useState(false);
+
+  const staleCount = useMemo(
+    () => actions.filter((a) => (!roleFilter || a.role_key === roleFilter) && isStale(a)).length,
+    [actions, roleFilter]
+  );
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -37,13 +45,15 @@ export default function ActionsView({
       if (category && a.category !== category) return false;
       if (effort && a.effort !== effort) return false;
       if (milestoneId && a.milestone_id !== milestoneId) return false;
+      if (staleOnly && !isStale(a)) return false;
+      if (quickOnly && a.effort !== "quick") return false;
       if (q) {
         const haystack = `${a.title} ${a.notes ?? ""} ${a.waiting_on ?? ""}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
     });
-  }, [actions, roleFilter, statusFilter, category, effort, milestoneId, search]);
+  }, [actions, roleFilter, statusFilter, category, effort, milestoneId, search, staleOnly, quickOnly]);
 
   const statusOptions: { value: StatusFilter; label: string }[] = [
     { value: "open_waiting", label: "Open + Waiting" },
@@ -119,6 +129,33 @@ export default function ActionsView({
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {staleCount > 0 && (
+          <button
+            onClick={() => setStaleOnly((v) => !v)}
+            className={
+              "h-8 px-3 rounded-full text-xs font-medium border " +
+              (staleOnly
+                ? "bg-amber-100 border-amber-300 text-amber-800 dark:bg-amber-900/40 dark:border-amber-800 dark:text-amber-300"
+                : "border-[var(--border)] text-[var(--foreground-muted)]")
+            }
+          >
+            Stale ({staleCount})
+          </button>
+        )}
+        <button
+          onClick={() => setQuickOnly((v) => !v)}
+          className={
+            "h-8 px-3 rounded-full text-xs font-medium border " +
+            (quickOnly
+              ? "bg-emerald-100 border-emerald-300 text-emerald-800 dark:bg-emerald-900/40 dark:border-emerald-800 dark:text-emerald-300"
+              : "border-[var(--border)] text-[var(--foreground-muted)]")
+          }
+        >
+          Quick wins
+        </button>
       </div>
 
       <div className="flex flex-col gap-2">

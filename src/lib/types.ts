@@ -88,6 +88,7 @@ export interface Action {
   completed_at: string | null;
   snoozed_until: string | null;
   recurrence_id: string | null;
+  last_activity_at: string;
   created_at: string;
   updated_at: string;
 }

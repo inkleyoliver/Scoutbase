@@ -137,6 +137,25 @@ export async function unsnoozeAction(id: string) {
   return updateAction({ id, snoozed_until: null });
 }
 
+/**
+ * §7.3 "Still real?" staleness prompt — "Yes, keep" resets the 21-day
+ * clock without changing anything else about the action. This is the one
+ * place we touch last_activity_at directly rather than relying on the
+ * status/notes trigger (see supabase/migrations/0002_staleness.sql).
+ */
+export async function markActionStillReal(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("actions").update({ last_activity_at: new Date().toISOString() }).eq("id", id);
+  if (error) return { ok: false as const, error: error.message };
+  revalidateActionViews();
+  return { ok: true as const };
+}
+
+export async function snoozeActionOneMonth(id: string) {
+  const until = toISODate(addDays(todayISO(), 30));
+  return snoozeAction(id, { date: until });
+}
+
 export async function deleteActionPermanently(id: string) {
   // Not exposed in the UI (spec: nothing silently deleted) — archive is the
   // supported "remove" path. Kept only for admin/debug use.
