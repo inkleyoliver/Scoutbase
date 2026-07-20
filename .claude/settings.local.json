@@ -23,7 +23,14 @@
       "Bash(npm uninstall *)",
       "Bash(wc -l \"C:\\\\Users\\\\Dell\\\\Downloads\\\\SCOUTBASE_SPEC.md\" \"C:\\\\Users\\\\Dell\\\\Scout Projects\\\\BUILD_PROGRESS.md\")",
       "Bash(git add *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(node -e \"try{require.resolve\\('sharp'\\); console.log\\('sharp available'\\)}catch\\(e\\){console.log\\('no sharp'\\)}\")",
+      "Bash(mkdir -p public/icons)",
+      "Bash(node -e ' *)",
+      "Bash(node -e \"console.log\\(Object.keys\\(require\\('serwist/package.json'\\).exports || {}\\)\\)\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{const p=JSON.parse\\(d\\);console.log\\(JSON.stringify\\(p.exports,null,2\\)\\)}\\)\")",
+      "Bash(node -e \"console.log\\(Object.keys\\(require\\('serwist'\\)\\)\\)\")",
+      "Bash(node -e \"console.log\\(Object.keys\\(require\\('serwist'\\)\\).filter\\(k=>/serwist/i.test\\(k\\)\\)\\)\")"
     ]
   }
 }

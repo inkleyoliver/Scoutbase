@@ -4,7 +4,19 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Scoutbase",
   description: "Personal action-management for two Scouting volunteer roles.",
-  // manifest.webmanifest + service worker land in phase 11 (PWA layer).
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Scoutbase",
+  },
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export const viewport: Viewport = {

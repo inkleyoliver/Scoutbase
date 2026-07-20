@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { captureBrainDump } from "@/lib/server/inboxMutations";
+import { queueCapture } from "@/lib/offlineQueue";
 
 // §1.1 / §5.1 — capture is reachable from every screen via FAB (mobile) or
 // a ⌘K bar (desktop). One tap -> textarea -> submit. No required fields
@@ -40,7 +41,17 @@ export default function CaptureBar() {
     const value = text.trim();
     if (!value) return;
     startTransition(async () => {
-      await captureBrainDump(value);
+      // §9: capture must survive a dropped connection — queue it locally
+      // rather than lose it if the network call fails.
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        queueCapture(value);
+      } else {
+        try {
+          await captureBrainDump(value);
+        } catch {
+          queueCapture(value);
+        }
+      }
       setText("");
       setJustCaptured(true);
       router.refresh();

@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { FocusModeProvider } from "./FocusModeContext";
 import FocusModeToggle from "./FocusModeToggle";
 import CaptureBar from "./CaptureBar";
+import PwaSetup from "./PwaSetup";
 import { signOut } from "@/app/login/actions";
 
 const NAV_ITEMS = [
@@ -26,6 +27,7 @@ export default function AppShell({
 
   return (
     <FocusModeProvider>
+      <PwaSetup />
       <div className="flex flex-1">
         {/* Desktop sidebar */}
         <aside className="hidden md:flex md:w-56 md:flex-col md:border-r md:border-[var(--border)] md:bg-[var(--surface)] md:px-4 md:py-6 md:gap-6">
