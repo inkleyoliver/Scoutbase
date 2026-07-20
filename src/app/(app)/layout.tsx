@@ -12,5 +12,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // authenticated route re-checks so a page never renders without a user.
   if (!user) redirect("/login");
 
-  return <AppShell userEmail={user.email ?? null}>{children}</AppShell>;
+  const { data: settings } = await supabase.from("user_settings").select("focus_default").maybeSingle();
+
+  return (
+    <AppShell userEmail={user.email ?? null} defaultFocusMode={settings?.focus_default}>
+      {children}
+    </AppShell>
+  );
 }

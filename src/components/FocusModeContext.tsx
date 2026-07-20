@@ -17,11 +17,19 @@ const FocusModeContext = createContext<FocusModeContextValue>({
 // §3 Focus mode — persistent role filter toggle (All | GSL | Explorers),
 // persisted in localStorage, default "All". Read once on mount to avoid
 // hydration mismatches (SSR always renders "All").
-export function FocusModeProvider({ children }: { children: React.ReactNode }) {
-  const [focusMode, setFocusModeState] = useState<FocusMode>("All");
+export function FocusModeProvider({
+  children,
+  defaultFocusMode = "All",
+}: {
+  children: React.ReactNode;
+  /** §7.6 Settings "Focus mode default" — only used when nothing is stored
+   * in localStorage yet, i.e. the very first load on a given device. */
+  defaultFocusMode?: FocusMode;
+}) {
+  const [focusMode, setFocusModeState] = useState<FocusMode>(defaultFocusMode);
 
   useEffect(() => {
-    // One-time hydration of a client-only value (localStorage); SSR always renders "All".
+    // One-time hydration of a client-only value (localStorage); SSR always renders defaultFocusMode.
     const stored = window.localStorage.getItem(FOCUS_MODE_STORAGE_KEY);
     if (stored === "All" || stored === "GSL" || stored === "Explorers") {
       // eslint-disable-next-line react-hooks/set-state-in-effect

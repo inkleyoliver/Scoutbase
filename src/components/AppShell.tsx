@@ -18,15 +18,17 @@ const NAV_ITEMS = [
 
 export default function AppShell({
   userEmail,
+  defaultFocusMode,
   children,
 }: {
   userEmail: string | null;
+  defaultFocusMode?: "All" | "GSL" | "Explorers";
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
 
   return (
-    <FocusModeProvider>
+    <FocusModeProvider defaultFocusMode={defaultFocusMode}>
       <PwaSetup />
       <div className="flex flex-1">
         {/* Desktop sidebar */}
