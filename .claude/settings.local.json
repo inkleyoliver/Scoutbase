@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init *)",
+      "Bash(npm -v)",
+      "Bash(npx --yes create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack)",
+      "Bash(npx --yes create-next-app@latest scoutbase-tmp --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --no-turbopack)",
+      "Bash(node -e \"let p=require\\('./package.json'\\); p.name='scoutbase'; require\\('fs'\\).writeFileSync\\('./package.json', JSON.stringify\\(p,null,2\\)+'\\\\n'\\)\")",
+      "Bash(npm install *)",
+      "Bash(mkdir -p \"/c/Users/Dell/Scout Projects/src/app/\\(app\\)/actions/[id]\")",
+      "Bash(npm run *)",
+      "Bash(xargs grep -ln \"GenericTable\")",
+      "Bash(xargs grep -l \"GenericTable\")",
+      "Bash(xargs grep -l \"createServerClient\")",
+      "Bash(npx tsc *)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(npm ls *)",
+      "Bash(npx --yes sql-lint --version)",
+      "Bash(node \"C:/Users/Dell/AppData/Local/Temp/claude/C--Users-Dell-Scout-Projects/43da5878-a3fd-456f-9c7d-d26f81df4104/scratchpad/lint-sql.mjs\")",
+      "Bash(cp \"C:/Users/Dell/AppData/Local/Temp/claude/C--Users-Dell-Scout-Projects/43da5878-a3fd-456f-9c7d-d26f81df4104/scratchpad/lint-sql.mjs\" \"/c/Users/Dell/Scout Projects/lint-sql.mjs\")",
+      "Bash(node lint-sql.mjs)",
+      "Bash(rm -f lint-sql.mjs lint-out.txt)",
+      "Bash(npm uninstall *)",
+      "Bash(wc -l \"C:\\\\Users\\\\Dell\\\\Downloads\\\\SCOUTBASE_SPEC.md\" \"C:\\\\Users\\\\Dell\\\\Scout Projects\\\\BUILD_PROGRESS.md\")",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}
