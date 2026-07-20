@@ -1,12 +1,24 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { getSupabaseServiceRoleKey, getSupabaseUrl } from "./env";
+import { createMockSupabaseClient } from "@/lib/demo/mockSupabaseClient";
 
 // Service-role client for routes with no authenticated request context: cron
 // jobs and the inbound-email webhook (§9, §5.2, §11). Bypasses RLS entirely,
 // so every caller MUST verify CRON_SECRET / INBOUND_EMAIL_SECRET first and
 // MUST scope queries to the single owner via getOwnerId() below — there is
 // no auth.uid() to fall back on here.
+//
+// DEMO_MODE=true swaps this for the same in-memory mock client used by
+// server.ts, so cron routes / the inbound-email webhook keep working when
+// exercised manually in demo mode. No effect when DEMO_MODE is unset.
 export function createAdminClient() {
+  if (process.env.DEMO_MODE === "true") {
+    return createMockSupabaseClient() as unknown as ReturnType<typeof createRealAdminClient>;
+  }
+  return createRealAdminClient();
+}
+
+function createRealAdminClient() {
   return createSupabaseClient(getSupabaseUrl(), getSupabaseServiceRoleKey(), {
     auth: { autoRefreshToken: false, persistSession: false },
   });

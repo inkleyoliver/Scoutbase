@@ -1,6 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getAnthropicClient, TRIAGE_MODEL } from "@/lib/anthropic";
 import { buildTriageSystemPrompt, EMAIL_TRIAGE_EXTRA, parseTriageResponse } from "@/lib/triage";
+import { buildCannedProposal } from "@/lib/demo/cannedTriage";
+
+function hasRealAnthropicKey(): boolean {
+  const key = process.env.ANTHROPIC_API_KEY;
+  return !!key && !key.includes("placeholder");
+}
 
 /**
  * Runs the AI triage call for a given inbox_items row and stores the parsed
@@ -39,6 +45,23 @@ export async function runTriageForInboxItem(
     item.source === "email"
       ? `Subject: ${item.email_subject ?? "(no subject)"}\nFrom: ${item.email_from ?? "(unknown)"}\n\n${item.raw_text.slice(0, 4000)}`
       : item.raw_text;
+
+  // DEMO_MODE with no real Anthropic key: skip the network call entirely and
+  // fall back to a deterministic heuristic proposal so the capture -> triage
+  // -> inbox flow still visibly works. If a real key IS configured, the demo
+  // deliberately still calls the real API — triage quality is part of what's
+  // being shown off.
+  if (process.env.DEMO_MODE === "true" && !hasRealAnthropicKey()) {
+    const proposal = buildCannedProposal(userText);
+    const { error: updateErr } = await supabase
+      .from("inbox_items")
+      .update({ ai_proposal: proposal })
+      .eq("id", inboxItemId);
+    if (updateErr) {
+      return { ok: false, error: updateErr.message };
+    }
+    return { ok: true };
+  }
 
   try {
     const anthropic = getAnthropicClient();

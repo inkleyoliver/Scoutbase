@@ -8,6 +8,20 @@ const PUBLIC_PATHS = ["/login", "/auth"];
 // unauthenticated users to /login. Also enforces the single-user allow-list
 // at the edge so protected pages never render for the wrong account.
 export async function updateSession(request: NextRequest) {
+  // DEMO_MODE=true: no real Supabase project to talk to, and the mock
+  // client is always "signed in" as the seeded owner — skip the auth
+  // roundtrip entirely rather than trying to run it through a mock cookie
+  // session. No effect when DEMO_MODE is unset (the real path below is
+  // untouched).
+  if (process.env.DEMO_MODE === "true") {
+    if (request.nextUrl.pathname === "/login") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/today";
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next({ request });
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(getSupabaseUrl(), getSupabaseAnonKey(), {
