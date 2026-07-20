@@ -208,3 +208,25 @@ export interface DigestLog {
 export interface ActionWithSubtasks extends Action {
   subtasks?: Subtask[];
 }
+
+export interface UserSettings {
+  id: string;
+  owner_id: string;
+  digest_enabled: boolean;
+  digest_time: string;
+  focus_default: FocusMode;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PushLogKind = "due_today" | "urgent" | "waiting_chase";
+
+export interface PushLog {
+  id: string;
+  owner_id: string;
+  kind: PushLogKind;
+  ref_id: string | null;
+  sent_at: string;
+  created_at: string;
+  updated_at: string;
+}
