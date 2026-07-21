@@ -3,8 +3,10 @@ import { daysSince } from "@/lib/date";
 import type { Action } from "@/lib/types";
 
 // §7.1 Balance indicator — informational, never shaming. A simple
-// two-segment bar of open + recently-completed items across GSL vs
-// Explorers, with a gentle line if one role has gone quiet.
+// two-segment bar of currently-open workload across GSL vs Explorers (so it
+// visibly moves the moment something is done or deleted), with a gentle line
+// if one role has gone quiet — that "no attention for N days" read still
+// factors in recent completions, since finishing something is attention.
 export default function BalanceIndicator({
   openActions,
   recentlyDone,
@@ -12,10 +14,8 @@ export default function BalanceIndicator({
   openActions: Action[];
   recentlyDone: Action[];
 }) {
-  const gslCount = openActions.filter((a) => a.role_key === "gsl").length +
-    recentlyDone.filter((a) => a.role_key === "gsl").length;
-  const explorersCount = openActions.filter((a) => a.role_key === "explorers").length +
-    recentlyDone.filter((a) => a.role_key === "explorers").length;
+  const gslCount = openActions.filter((a) => a.role_key === "gsl").length;
+  const explorersCount = openActions.filter((a) => a.role_key === "explorers").length;
   const total = gslCount + explorersCount;
 
   const gslPct = total === 0 ? 50 : Math.round((gslCount / total) * 100);
