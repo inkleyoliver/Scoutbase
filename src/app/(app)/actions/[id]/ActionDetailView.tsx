@@ -9,6 +9,7 @@ import { StatusPill } from "@/components/StatusPill";
 import {
   addSubtask,
   archiveAction,
+  deleteActionPermanently,
   deleteSubtask,
   reopenAction,
   snoozeAction,
@@ -155,6 +156,21 @@ export default function ActionDetailView({
             Reopen
           </button>
         )}
+
+        <button
+          disabled={pending}
+          onClick={() => {
+            if (confirm(`Delete "${action.title}"? This can't be undone.`)) {
+              startTransition(async () => {
+                await deleteActionPermanently(action.id);
+                router.push("/actions");
+              });
+            }
+          }}
+          className="h-10 px-4 rounded-lg border border-[var(--overdue)] text-sm text-[var(--overdue)] ml-auto"
+        >
+          Delete permanently
+        </button>
       </section>
     </div>
   );

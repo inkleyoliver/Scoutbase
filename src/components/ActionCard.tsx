@@ -7,7 +7,7 @@ import RoleChip from "./RoleChip";
 import { StatusPill, PriorityLabel } from "./StatusPill";
 import { CATEGORY_LABELS, EFFORT_LABELS } from "@/lib/constants";
 import { formatShortDate, formatRelativeDue } from "@/lib/date";
-import { markActionDone } from "@/lib/server/actionMutations";
+import { deleteActionPermanently, markActionDone } from "@/lib/server/actionMutations";
 import StaleBadge from "./StaleBadge";
 import { isStale } from "@/lib/staleness";
 import type { ActionWithSubtasks } from "@/lib/types";
@@ -79,6 +79,23 @@ export default function ActionCard({ action }: { action: ActionWithSubtasks }) {
         )}
       </Link>
     </div>
+
+      <div className="flex justify-end">
+        <button
+          disabled={pending}
+          onClick={() => {
+            if (confirm(`Delete "${action.title}"? This can't be undone.`)) {
+              startTransition(async () => {
+                await deleteActionPermanently(action.id);
+                router.refresh();
+              });
+            }
+          }}
+          className="text-xs text-[var(--foreground-muted)] hover:text-[var(--overdue)]"
+        >
+          Delete
+        </button>
+      </div>
 
       {stale && <StaleBadge actionId={action.id} />}
     </div>

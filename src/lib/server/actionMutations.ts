@@ -157,8 +157,9 @@ export async function snoozeActionOneMonth(id: string) {
 }
 
 export async function deleteActionPermanently(id: string) {
-  // Not exposed in the UI (spec: nothing silently deleted) — archive is the
-  // supported "remove" path. Kept only for admin/debug use.
+  // Exposed in the UI behind a confirm step (Today card, Actions list, and
+  // the detail page) — the user explicitly asked for a real delete, distinct
+  // from Done/Archive which are recoverable via Reopen.
   const supabase = await createClient();
   const { error } = await supabase.from("actions").delete().eq("id", id);
   if (error) return { ok: false as const, error: error.message };

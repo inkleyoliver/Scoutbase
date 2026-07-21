@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import RoleChip from "./RoleChip";
 import { formatRelativeDue, formatShortDate } from "@/lib/date";
-import { markActionDone, snoozeAction, type SnoozeOption } from "@/lib/server/actionMutations";
+import { deleteActionPermanently, markActionDone, snoozeAction, type SnoozeOption } from "@/lib/server/actionMutations";
 import type { Action } from "@/lib/types";
 
 // §7.1 / §10 — relative time is the largest text on the card after the
@@ -99,6 +99,21 @@ export default function TodayCard({ action }: { action: Action }) {
         <Link href={`/actions/${action.id}`} className="h-10 px-4 rounded-lg text-sm font-medium text-[var(--foreground-muted)] flex items-center">
           Open
         </Link>
+
+        <button
+          disabled={pending}
+          onClick={() => {
+            if (confirm(`Delete "${action.title}"? This can't be undone.`)) {
+              startTransition(async () => {
+                await deleteActionPermanently(action.id);
+                router.refresh();
+              });
+            }
+          }}
+          className="h-10 px-3 rounded-lg text-sm font-medium text-[var(--foreground-muted)] hover:text-[var(--overdue)] ml-auto"
+        >
+          Delete
+        </button>
       </div>
     </div>
   );
