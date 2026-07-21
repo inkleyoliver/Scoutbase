@@ -1,0 +1,24 @@
+name: Hourly push-urgency cron
+
+# Vercel's free (Hobby) plan only allows daily cron jobs, but §8.2 of the
+# spec calls for an hourly urgency check. GitHub Actions' free tier allows
+# scheduled workflows at any interval, so this hits the same route Vercel
+# Cron would have called, on the same schedule, at no cost.
+#
+# Requires two repo secrets (Settings -> Secrets and variables -> Actions):
+#   APP_URL     - the deployed app's base URL, e.g. https://scoutbase.vercel.app
+#   CRON_SECRET - must match the CRON_SECRET env var set on Vercel
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call /api/cron/push-urgency
+        run: |
+          curl -sf -X GET "${{ secrets.APP_URL }}/api/cron/push-urgency" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

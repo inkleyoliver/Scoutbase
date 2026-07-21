@@ -7,10 +7,6 @@
     {
       "path": "/api/cron/auto-archive",
       "schedule": "0 3 * * *"
-    },
-    {
-      "path": "/api/cron/push-urgency",
-      "schedule": "0 * * * *"
     }
   ]
 }
