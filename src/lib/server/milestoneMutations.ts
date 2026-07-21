@@ -60,3 +60,14 @@ export async function updateMilestone(input: UpdateMilestoneInput) {
 export async function setMilestoneStatus(id: string, status: MilestoneStatus) {
   return updateMilestone({ id, status });
 }
+
+// Attached actions aren't deleted with the milestone — milestone_id is
+// `on delete set null` (supabase/migrations/0001_init.sql), so they just
+// become unlinked, still visible in Actions/Today.
+export async function deleteMilestone(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("milestones").delete().eq("id", id);
+  if (error) return { ok: false as const, error: error.message };
+  revalidateMilestoneViews();
+  return { ok: true as const };
+}

@@ -6,7 +6,7 @@ import Link from "next/link";
 import ActionCard from "@/components/ActionCard";
 import RoleChip from "@/components/RoleChip";
 import { createAction } from "@/lib/server/actionMutations";
-import { setMilestoneStatus, updateMilestone } from "@/lib/server/milestoneMutations";
+import { deleteMilestone, setMilestoneStatus, updateMilestone } from "@/lib/server/milestoneMutations";
 import type { Action, Milestone, MilestoneStatus } from "@/lib/types";
 
 const STATUS_OPTIONS: { value: MilestoneStatus; label: string }[] = [
@@ -128,6 +128,27 @@ export default function MilestoneDetailView({
             actions.map((a) => <ActionCard key={a.id} action={a} />)
           )}
         </div>
+      </section>
+
+      <section className="flex justify-end border-t border-[var(--border)] pt-5">
+        <button
+          disabled={pending}
+          onClick={() => {
+            const warning =
+              actions.length > 0
+                ? `Delete "${milestone.title}"? This can't be undone. Its ${actions.length} attached action${actions.length === 1 ? "" : "s"} will stay, just unlinked from this milestone.`
+                : `Delete "${milestone.title}"? This can't be undone.`;
+            if (confirm(warning)) {
+              startTransition(async () => {
+                await deleteMilestone(milestone.id);
+                router.push("/plan");
+              });
+            }
+          }}
+          className="h-10 px-4 rounded-lg border border-[var(--overdue)] text-sm text-[var(--overdue)]"
+        >
+          Delete permanently
+        </button>
       </section>
     </div>
   );
