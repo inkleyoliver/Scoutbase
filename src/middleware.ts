@@ -11,8 +11,8 @@ export const config = {
      * Match all request paths except:
      * - _next/static, _next/image (static/optimisation assets)
      * - favicon.ico, manifest, icons
-     * - api routes that verify their own secrets (cron/webhooks)
+     * - api/cron routes that verify their own secret (CRON_SECRET)
      */
-    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|icons|api/inbound-email|api/cron).*)",
+    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|icons|api/cron).*)",
   ],
 };

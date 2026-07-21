@@ -34,7 +34,7 @@ const TABLE_DEFAULTS: Partial<Record<DemoTable, () => Row>> = {
     last_activity_at: nowIso(),
   }),
   subtasks: () => ({ done: false, sort_order: 0 }),
-  inbox_items: () => ({ ai_proposal: null, email_subject: null, email_from: null, status: "pending" }),
+  inbox_items: () => ({ ai_proposal: null, status: "pending" }),
   decisions: () => ({ superseded_by: null, meeting_note_id: null, decided_on: null, decided_by: null, detail: null }),
   meeting_notes: () => ({ meeting_date: null, body: null, attendees: null }),
   contacts: () => ({ role_title: null, email: null, phone: null, notes: null }),
@@ -50,7 +50,7 @@ const TABLE_DEFAULTS: Partial<Record<DemoTable, () => Row>> = {
   }),
 };
 
-// owner_id is present on every table except none in this schema — all 14
+// owner_id is present on every table except none in this schema — all
 // tables carry it, so always stamp it on insert/upsert.
 const OWNS_OWNER_ID = new Set<DemoTable>([
   "roles",
@@ -64,7 +64,6 @@ const OWNS_OWNER_ID = new Set<DemoTable>([
   "decisions",
   "resources",
   "push_subscriptions",
-  "digest_log",
   "push_log",
   "user_settings",
 ]);

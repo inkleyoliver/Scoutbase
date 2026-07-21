@@ -34,8 +34,6 @@ export async function removePushSubscription(endpoint: string) {
 }
 
 export async function updateUserSettings(patch: {
-  digest_enabled?: boolean;
-  digest_time?: string;
   focus_default?: "All" | "GSL" | "Explorers";
 }) {
   const supabase = await createClient();

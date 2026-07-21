@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getAnthropicClient, TRIAGE_MODEL } from "@/lib/anthropic";
-import { buildTriageSystemPrompt, EMAIL_TRIAGE_EXTRA, parseTriageResponse } from "@/lib/triage";
-import { buildCannedProposal } from "@/lib/demo/cannedTriage";
+import { buildTriageSystemPrompt, parseTriageResponse } from "@/lib/triage";
+import { buildFallbackTriageProposal } from "@/lib/triageFallback";
 
 function hasRealAnthropicKey(): boolean {
   const key = process.env.ANTHROPIC_API_KEY;
@@ -10,12 +10,13 @@ function hasRealAnthropicKey(): boolean {
 
 /**
  * Runs the AI triage call for a given inbox_items row and stores the parsed
- * proposal back on the row. Shared by /api/triage (brain dump + retry) and
- * the future inbound-email webhook (phase 10).
+ * proposal back on the row. Used by /api/triage (brain dump capture + retry)
+ * — inbox_items only ever come from brain dumps now (inbound email capture
+ * was removed).
  *
- * §5.1 step 4 / §5.2 step 5: parsing is defensive and never throws — on any
- * failure the inbox item is left with ai_proposal = null so the capture is
- * never lost, and the caller can offer manual conversion.
+ * §5.1 step 4: parsing is defensive and never throws — on any failure the
+ * inbox item is left with ai_proposal = null so the capture is never lost,
+ * and the caller can offer manual conversion.
  */
 export async function runTriageForInboxItem(
   supabase: SupabaseClient,
@@ -36,23 +37,19 @@ export async function runTriageForInboxItem(
     supabase.from("contacts").select("name, role_title"),
   ]);
 
-  const systemPrompt = buildTriageSystemPrompt(
-    { milestones: milestones ?? [], contacts: contacts ?? [] },
-    item.source === "email" ? EMAIL_TRIAGE_EXTRA : undefined
-  );
+  const systemPrompt = buildTriageSystemPrompt({ milestones: milestones ?? [], contacts: contacts ?? [] });
 
-  const userText =
-    item.source === "email"
-      ? `Subject: ${item.email_subject ?? "(no subject)"}\nFrom: ${item.email_from ?? "(unknown)"}\n\n${item.raw_text.slice(0, 4000)}`
-      : item.raw_text;
+  const userText = item.raw_text;
 
-  // DEMO_MODE with no real Anthropic key: skip the network call entirely and
-  // fall back to a deterministic heuristic proposal so the capture -> triage
-  // -> inbox flow still visibly works. If a real key IS configured, the demo
-  // deliberately still calls the real API — triage quality is part of what's
-  // being shown off.
-  if (process.env.DEMO_MODE === "true" && !hasRealAnthropicKey()) {
-    const proposal = buildCannedProposal(userText);
+  // No real Anthropic key configured: this is the production default (Oli
+  // has chosen not to pay for an API key), not just a demo-mode fallback.
+  // Skip the network call entirely and use the deterministic keyword
+  // heuristic instead so the capture -> triage -> inbox flow always works
+  // for free. The moment a real ANTHROPIC_API_KEY is set, this branch stops
+  // being taken and the real Anthropic call below runs instead — no other
+  // code change needed to upgrade.
+  if (!hasRealAnthropicKey()) {
+    const proposal = buildFallbackTriageProposal(userText);
     const { error: updateErr } = await supabase
       .from("inbox_items")
       .update({ ai_proposal: proposal })

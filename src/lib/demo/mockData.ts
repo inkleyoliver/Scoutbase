@@ -513,8 +513,6 @@ export const inboxItems = [
     raw_text:
       "Need to email Priya about the section leader recruitment drive before end of month, and chase the minibus quote for the summer expedition.",
     source: "brain_dump",
-    email_subject: null as string | null,
-    email_from: null as string | null,
     ai_proposal: {
       items: [
         {
@@ -552,10 +550,8 @@ export const inboxItems = [
     id: uid(),
     owner_id: DEMO_OWNER_ID,
     raw_text:
-      "Hi, following up on last week's trustee meeting — can you send over the hall lease paperwork when you get a chance? Thanks, Dave",
-    source: "email",
-    email_subject: "RE: Trustee meeting notes",
-    email_from: "dave@example.org",
+      "Dave asked at last week's trustee meeting for the hall lease paperwork to be sent over when I get a chance.",
+    source: "brain_dump",
     ai_proposal: {
       items: [
         {
@@ -582,8 +578,6 @@ export const inboxItems = [
     owner_id: DEMO_OWNER_ID,
     raw_text: "Random thought in the car — need to sort out the badge cupboard at some point, it's a mess.",
     source: "brain_dump",
-    email_subject: null as string | null,
-    email_from: null as string | null,
     ai_proposal: null as unknown,
     status: "pending",
     created_at: isoTimestamp(-2),
@@ -761,11 +755,10 @@ export const resources = [
 ];
 
 // ---------------------------------------------------------------------------
-// push_subscriptions / digest_log / push_log — empty, populated only by
-// interacting with Settings in demo mode.
+// push_subscriptions / push_log — empty, populated only by interacting with
+// Settings in demo mode.
 // ---------------------------------------------------------------------------
 export const pushSubscriptions: Array<Record<string, unknown>> = [];
-export const digestLog: Array<Record<string, unknown>> = [];
 export const pushLog: Array<Record<string, unknown>> = [];
 
 // ---------------------------------------------------------------------------
@@ -775,8 +768,6 @@ export const userSettings = [
   {
     id: uid(),
     owner_id: DEMO_OWNER_ID,
-    digest_enabled: false,
-    digest_time: "07:30",
     focus_default: "All",
     created_at: now,
     updated_at: now,
@@ -799,7 +790,6 @@ export type DemoTable =
   | "decisions"
   | "resources"
   | "push_subscriptions"
-  | "digest_log"
   | "push_log"
   | "user_settings";
 
@@ -818,7 +808,6 @@ interface DemoStore {
   decisions: typeof decisions;
   resources: typeof resources;
   push_subscriptions: typeof pushSubscriptions;
-  digest_log: typeof digestLog;
   push_log: typeof pushLog;
   user_settings: typeof userSettings;
 }
@@ -839,7 +828,6 @@ export const demoStore: DemoStore =
     decisions,
     resources,
     push_subscriptions: pushSubscriptions,
-    digest_log: digestLog,
     push_log: pushLog,
     user_settings: userSettings,
   });

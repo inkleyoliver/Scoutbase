@@ -22,7 +22,7 @@ Enums you MUST use exactly (lowercase, hyphen-free unless shown):
 - confidence: "high" | "medium" | "low"
 `;
 
-export function buildTriageSystemPrompt(ctx: TriageContext, extra?: string): string {
+export function buildTriageSystemPrompt(ctx: TriageContext): string {
   const milestonesByRole: Record<string, string[]> = {};
   for (const m of ctx.milestones) {
     (milestonesByRole[m.role_key] ??= []).push(m.title);
@@ -41,7 +41,7 @@ ${milestoneLines || "  (none yet)"}
 
 Known contact names: ${contactNames}
 ${ENUM_CONTEXT}
-Task: read the user's free-text capture (a "brain dump" or a pasted email) and propose zero or more discrete, actionable items. Do not invent tasks the text doesn't support. Split multiple distinct asks into separate items. If a sentence is just a note/observation with no action, put it in "non_action_notes" instead of forcing it into an item.
+Task: read the user's free-text capture (a "brain dump") and propose zero or more discrete, actionable items. Do not invent tasks the text doesn't support. Split multiple distinct asks into separate items. If a sentence is just a note/observation with no action, put it in "non_action_notes" instead of forcing it into an item.
 
 For each item:
 - "title": short, imperative, specific (e.g. "Chase Dave about the hall lease").
@@ -52,7 +52,6 @@ For each item:
 - "milestone_title_match": the exact title of a milestone above if this action clearly serves it, else null. Only set this with confidence "high" on the item.
 - "subtasks": an array of short subtask title strings if the text implies a checklist, else [].
 - "confidence": your confidence in this parse — "high" | "medium" | "low".
-${extra ? `\n${extra}\n` : ""}
 Respond with ONLY valid JSON, no prose, no markdown code fences, matching exactly this shape:
 {
   "items": [
@@ -72,8 +71,6 @@ Respond with ONLY valid JSON, no prose, no markdown code fences, matching exactl
   "non_action_notes": ["string"]
 }`;
 }
-
-export const EMAIL_TRIAGE_EXTRA = `This text is an inbound email. Identify the actual asks in the email, not every sentence — emails often contain pleasantries, signatures, and context that are not actions. If the action is really "reply to / chase this person", set "waiting_on" to the sender's name.`;
 
 const VALID_ROLE_KEYS: RoleKey[] = ["gsl", "explorers", "both"];
 

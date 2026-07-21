@@ -13,7 +13,6 @@ const TABLES = [
   "decisions",
   "resources",
   "push_subscriptions",
-  "digest_log",
   "user_settings",
 ] as const;
 

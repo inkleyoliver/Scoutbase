@@ -9,10 +9,6 @@
       "schedule": "0 3 * * *"
     },
     {
-      "path": "/api/cron/digest",
-      "schedule": "0 6 * * *"
-    },
-    {
       "path": "/api/cron/push-urgency",
       "schedule": "0 * * * *"
     }

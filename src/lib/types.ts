@@ -16,9 +16,9 @@ export type ActionEffort = "quick" | "medium" | "big";
 
 export type ActionStatus = "open" | "waiting" | "done" | "archived";
 
-export type ActionSource = "manual" | "brain_dump" | "email" | "recurring";
+export type ActionSource = "manual" | "brain_dump" | "recurring";
 
-export type InboxSource = "brain_dump" | "email";
+export type InboxSource = "brain_dump";
 
 export type InboxStatus = "pending" | "processed" | "dismissed";
 
@@ -127,8 +127,6 @@ export interface InboxItem {
   owner_id: string;
   raw_text: string;
   source: InboxSource;
-  email_subject: string | null;
-  email_from: string | null;
   ai_proposal: AiProposal | null;
   status: InboxStatus;
   created_at: string;
@@ -196,15 +194,6 @@ export interface PushSubscriptionRow {
   updated_at: string;
 }
 
-export interface DigestLog {
-  id: string;
-  owner_id: string;
-  sent_at: string;
-  summary: Record<string, unknown> | null;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface ActionWithSubtasks extends Action {
   subtasks?: Subtask[];
 }
@@ -212,8 +201,6 @@ export interface ActionWithSubtasks extends Action {
 export interface UserSettings {
   id: string;
   owner_id: string;
-  digest_enabled: boolean;
-  digest_time: string;
   focus_default: FocusMode;
   created_at: string;
   updated_at: string;

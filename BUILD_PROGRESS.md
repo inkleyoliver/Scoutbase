@@ -346,24 +346,110 @@ with `npx tsc --noEmit` and `npm run build` before moving to the next.
 
 # What Oli needs to do to go live
 
-See `README.md` §8 for the full checklist. Summary: provision Supabase
-(migrations + disable sign-ups + create the one user + seed), get an
-Anthropic API key, get a Resend API key + verify a sending domain, generate
-VAPID keys, pick `CRON_SECRET`/`INBOUND_EMAIL_SECRET` values, set up
-Cloudflare Email Routing → Worker (or Resend Inbound), deploy to Vercel with
-every env var set, confirm the 4 cron jobs registered, set
-`NEXT_PUBLIC_APP_URL` and redeploy, then install to iOS Home Screen and
-enable push.
+See `README.md` §7 for the full checklist. Summary: provision Supabase
+(migrations `0001`–`0004` + disable sign-ups + create the one user + seed),
+generate VAPID keys, pick a `CRON_SECRET`, deploy to Vercel with every env
+var set, confirm the 3 cron jobs registered, set `NEXT_PUBLIC_APP_URL` and
+redeploy, then install to iOS Home Screen and enable push. An Anthropic API
+key is optional — see below.
+
+---
+
+# Post-launch pass: free triage by default, email features removed
+
+After the initial 12 phases were built and committed, Oli decided (to avoid
+any ongoing cost) to: (1) never pay for an Anthropic API key, and (2) drop
+both email features entirely. This pass implements both decisions.
+
+## AI triage now defaults to a free keyword heuristic
+
+- `src/lib/server/runTriage.ts`'s fallback condition changed from
+  `DEMO_MODE === "true" && !hasRealAnthropicKey()` to simply
+  `!hasRealAnthropicKey()` — the heuristic fallback is now the **production
+  default** whenever no real `ANTHROPIC_API_KEY` is set, not just a
+  demo-mode artifact. The real Anthropic API is only ever called when a real
+  key is present, and the upgrade is fully transparent — add a real key
+  later and triage switches to real Claude with no other code change; remove
+  it again and it falls back to the heuristic.
+- The heuristic itself moved from `src/lib/demo/cannedTriage.ts` to
+  `src/lib/triageFallback.ts` (top-level `lib`, not `lib/demo`) to reflect
+  that it's a first-class production code path now, and was extended a bit
+  for real-world use: effort guessing (quick/medium/big by keyword), a
+  broader due-date parser (weekday names like "by Friday", "in N days", not
+  just today/tomorrow/next week/end of month), and a cap raised from 3 to 5
+  proposed items per capture. It's still deliberately simple — keyword
+  regex matching, not an ML model — and demo mode continues to use the same
+  function.
+
+## Both email features removed entirely
+
+- **Inbound email capture (phase 10, spec §5.2)**: deleted
+  `src/app/api/inbound-email/route.ts` and `src/lib/htmlStrip.ts` (its only
+  consumer). Removed `EMAIL_TRIAGE_EXTRA` from `src/lib/triage.ts` and the
+  `item.source === "email"` branching in `runTriage.ts` — `inbox_items` are
+  brain-dump-only now. `InboxSource`/`ActionSource` types dropped `"email"`.
+  `InboxItemGroup.tsx` no longer renders an email-specific label.
+- **Outbound daily digest email (phase 9's Resend half)**: deleted
+  `src/app/api/cron/digest/route.ts`, `src/lib/resend.ts`,
+  `src/lib/server/buildDigest.ts`, `src/lib/server/digestEmail.ts`, and the
+  `resend` npm dependency. Removed the digest cron entry from `vercel.json`.
+  Removed the "Daily digest" on/off + time UI from
+  `NotificationSettings.tsx` — the push-notification enable/subscribe UI
+  (the other half of phase 9) is untouched and fully intact. Confirmed
+  `buildDigest.ts`'s ranking reuse (`rankTodayActions` from
+  `src/lib/ranking.ts`) was one-directional — `ranking.ts` has no knowledge
+  of the digest and needed no changes; only the digest-specific file was
+  deleted.
+- Nudges going forward are push notifications (§8.2, unchanged) plus the
+  in-app Today view — no email channel of any kind remains.
+- **New migration** `supabase/migrations/0004_remove_email.sql` (additive,
+  doesn't edit 0001–0003): drops `inbox_items.email_subject`/`email_from`,
+  tightens `inbox_items.source` to `check (source in ('brain_dump'))` and
+  `actions.source` to `check (source in ('manual', 'brain_dump',
+  'recurring'))` (converting any historical `'email'` rows to
+  `'brain_dump'` first), drops the `digest_log` table, and drops
+  `user_settings.digest_enabled`/`digest_time`. **Not yet applied to the
+  live project** — Oli needs to paste it into the Supabase SQL editor.
+- Updated `.env.example`/`.env.local`, `README.md`, and this file to match:
+  removed `RESEND_API_KEY`, `DIGEST_FROM_EMAIL`, `INBOUND_EMAIL_SECRET` and
+  every mention of Resend/Cloudflare Email Routing from the live docs
+  (history of what was originally built is kept above, in the phase 9/10
+  sections, for context).
+
+## Judgment calls made in this pass
+
+- Tightened `actions.source`'s check constraint too, even though the task
+  only explicitly asked about `inbox_items.source` — `'email'` was legal
+  there but never actually reachable from app code (inbox-derived actions
+  have always been stamped `source: 'brain_dump'` in
+  `src/lib/server/inboxMutations.ts`), so tightening it is free cleanup with
+  no behavioural change.
+- Renamed the demo-only `buildCannedProposal` to
+  `buildFallbackTriageProposal` in its new home to make its production role
+  clear; demo mode's own usage is unaffected since it calls through the same
+  `runTriageForInboxItem` path.
+- Rewrote the two demo-mode inbox items that previously had `source:
+  "email"` (`mockData.ts`) as brain-dump-flavoured text instead of deleting
+  them, so demo mode keeps the same number/variety of example inbox items.
 
 # Final status
 
-All 12 phases of `SCOUTBASE_SPEC.md` §12 are built. `npx tsc --noEmit` and
-`npm run build` both pass with zero errors and zero warnings as of the last
-commit on this branch. No live Supabase project exists yet, so none of this
-has been exercised against a real backend — the same caveat that applied to
-phases 1–4 applies here: migrations were written carefully against the
-spec and (for 0001) verified against a real Postgres engine in phase 1, but
-0002/0003 have only been read-reviewed, not executed against a live
-instance, since no project exists to run them against. Run
-`npx supabase db push` (or paste them into the SQL editor) as the first
-real step, then work through the README's "go live" checklist.
+All 12 original phases of `SCOUTBASE_SPEC.md` §12 are built, plus this
+post-launch pass. Current state:
+
+- **No Anthropic API key is required.** Triage runs on a free, built-in
+  keyword heuristic by default (`src/lib/triageFallback.ts`); setting a real
+  `ANTHROPIC_API_KEY` transparently upgrades to real Claude triage, and
+  removing it falls back to the heuristic again — both paths are exercised
+  by `npm run build`.
+- **No email features exist.** Inbound email capture and the outbound daily
+  digest have both been fully removed (code, docs, and dependency). Nudges
+  are push notifications + the in-app Today view only.
+- **A new migration exists and is not yet live**:
+  `supabase/migrations/0004_remove_email.sql` needs to be pasted into the
+  Supabase SQL editor before this pass's schema assumptions (tightened
+  `source` constraints, dropped email/digest columns and the `digest_log`
+  table) are true of the live database. The app's TypeScript types already
+  assume the post-migration schema, so apply it before deploying this code.
+- `npx tsc --noEmit` and `npm run build` both pass with zero errors as of
+  the last commit on this branch.

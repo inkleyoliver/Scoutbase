@@ -37,8 +37,6 @@ export default function NotificationSettings({
     () => typeof navigator !== "undefined" && "serviceWorker" in navigator && "PushManager" in window
   );
 
-  const [digestEnabled, setDigestEnabled] = useState(settings?.digest_enabled ?? true);
-  const [digestTime, setDigestTime] = useState(settings?.digest_time ?? "07:00");
   const [focusDefault, setFocusDefault] = useState(settings?.focus_default ?? "All");
 
   async function enablePush() {
@@ -78,7 +76,7 @@ export default function NotificationSettings({
 
   async function saveSettings() {
     setPending(true);
-    await updateUserSettings({ digest_enabled: digestEnabled, digest_time: digestTime, focus_default: focusDefault });
+    await updateUserSettings({ focus_default: focusDefault });
     setPending(false);
     router.refresh();
   }
@@ -121,23 +119,6 @@ export default function NotificationSettings({
           </button>
         </div>
         {message && <p className="text-xs text-[var(--foreground-muted)]">{message}</p>}
-      </div>
-
-      <div className="flex flex-col gap-2 border-t border-[var(--border)] pt-4">
-        <h2 className="text-sm font-semibold">Daily digest</h2>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={digestEnabled} onChange={(e) => setDigestEnabled(e.target.checked)} className="h-5 w-5" />
-          Send me a daily digest email
-        </label>
-        <div className="flex items-center gap-2">
-          <label className="text-sm">Time</label>
-          <input
-            type="time"
-            value={digestTime}
-            onChange={(e) => setDigestTime(e.target.value)}
-            className="h-10 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
-          />
-        </div>
       </div>
 
       <div className="flex flex-col gap-2 border-t border-[var(--border)] pt-4">

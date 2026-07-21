@@ -37,9 +37,7 @@ export default function InboxItemGroup({
     <div className="flex flex-col gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-0.5">
-          <p className="text-xs uppercase tracking-wide text-[var(--foreground-muted)]">
-            {item.source === "email" ? `Email — ${item.email_subject ?? "no subject"}` : "Brain dump"}
-          </p>
+          <p className="text-xs uppercase tracking-wide text-[var(--foreground-muted)]">Brain dump</p>
           <p className="text-sm text-[var(--foreground-muted)] whitespace-pre-wrap line-clamp-3">{item.raw_text}</p>
         </div>
         <button

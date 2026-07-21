@@ -6,7 +6,6 @@ import type {
   Action,
   Contact,
   Decision,
-  DigestLog,
   InboxItem,
   MeetingNote,
   Milestone,
@@ -38,7 +37,6 @@ export interface Database {
       decisions: TableDef<Decision>;
       resources: TableDef<Resource>;
       push_subscriptions: TableDef<PushSubscriptionRow>;
-      digest_log: TableDef<DigestLog>;
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
