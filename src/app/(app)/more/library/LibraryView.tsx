@@ -137,7 +137,7 @@ function NewResourceForm({ defaultRole, onDone }: { defaultRole?: RoleKey; onDon
           <select value={roleKey} onChange={(e) => setRoleKey(e.target.value as RoleKey)} className="h-11 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm">
             <option value="gsl">GSL</option>
             <option value="explorers">Explorers</option>
-            <option value="both">Both / Personal</option>
+            <option value="both">Personal</option>
           </select>
         </div>
         <div className="flex flex-col gap-1.5">

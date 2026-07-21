@@ -61,7 +61,7 @@ async function main() {
     [
       { owner_id, key: "gsl", label: "GSL", color: "#4C1D95" },
       { owner_id, key: "explorers", label: "Explorers", color: "#0F766E" },
-      { owner_id, key: "both", label: "Both / Personal", color: "#6B7280" },
+      { owner_id, key: "both", label: "Personal", color: "#6B7280" },
     ],
     { onConflict: "key" }
   );

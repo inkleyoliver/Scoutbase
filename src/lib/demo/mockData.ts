@@ -44,7 +44,7 @@ export const roles = [
     id: uid(),
     owner_id: DEMO_OWNER_ID,
     key: "both",
-    label: "Both / Personal",
+    label: "Personal",
     color: "#6B7280",
     created_at: now,
     updated_at: now,

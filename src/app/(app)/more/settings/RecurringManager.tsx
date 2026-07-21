@@ -108,7 +108,7 @@ function NewRecurrenceForm({ onDone }: { onDone: () => void }) {
         <select value={roleKey} onChange={(e) => setRoleKey(e.target.value as RoleKey)} className="h-11 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm">
           <option value="gsl">GSL</option>
           <option value="explorers">Explorers</option>
-          <option value="both">Both / Personal</option>
+          <option value="both">Personal</option>
         </select>
         <select value={rule} onChange={(e) => setRule(e.target.value as RecurrenceRule)} className="h-11 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm">
           {Object.entries(RULE_LABEL).map(([k, label]) => (

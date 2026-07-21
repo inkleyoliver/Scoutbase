@@ -3,7 +3,7 @@
 import { useFocusMode } from "./FocusModeContext";
 import type { FocusMode } from "@/lib/types";
 
-const OPTIONS: FocusMode[] = ["All", "GSL", "Explorers"];
+const OPTIONS: FocusMode[] = ["All", "GSL", "Explorers", "Personal"];
 
 export default function FocusModeToggle() {
   const { focusMode, setFocusMode } = useFocusMode();

@@ -4,7 +4,7 @@
 
 export type RoleKey = "gsl" | "explorers" | "both";
 
-export type FocusMode = "All" | "GSL" | "Explorers";
+export type FocusMode = "All" | "GSL" | "Explorers" | "Personal";
 
 export type MilestoneStatus = "not_started" | "in_progress" | "complete" | "parked";
 

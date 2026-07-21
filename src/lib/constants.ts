@@ -4,13 +4,14 @@ import type { ActionCategory, ActionEffort, ActionPriority, FocusMode, RoleKey }
 export const ROLE_META: Record<RoleKey, { label: string; color: string; colorSoft: string }> = {
   gsl: { label: "GSL", color: "#4C1D95", colorSoft: "#EDE9FE" },
   explorers: { label: "Explorers", color: "#0F766E", colorSoft: "#CCFBF1" },
-  both: { label: "Both / Personal", color: "#6B7280", colorSoft: "#F3F4F6" },
+  both: { label: "Personal", color: "#6B7280", colorSoft: "#F3F4F6" },
 };
 
 export const FOCUS_MODE_TO_ROLE_KEY: Record<FocusMode, RoleKey | null> = {
   All: null,
   GSL: "gsl",
   Explorers: "explorers",
+  Personal: "both",
 };
 
 export const FOCUS_MODE_STORAGE_KEY = "scoutbase:focus-mode";

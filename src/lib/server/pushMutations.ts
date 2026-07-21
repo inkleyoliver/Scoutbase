@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import type { FocusMode } from "@/lib/types";
 
 export async function getVapidPublicKey(): Promise<string | null> {
   return process.env.VAPID_PUBLIC_KEY || null;
@@ -34,7 +35,7 @@ export async function removePushSubscription(endpoint: string) {
 }
 
 export async function updateUserSettings(patch: {
-  focus_default?: "All" | "GSL" | "Explorers";
+  focus_default?: FocusMode;
 }) {
   const supabase = await createClient();
   const {

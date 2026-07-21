@@ -8,7 +8,7 @@ import {
   savePushSubscription,
   updateUserSettings,
 } from "@/lib/server/pushMutations";
-import type { PushSubscriptionRow, UserSettings } from "@/lib/types";
+import type { FocusMode, PushSubscriptionRow, UserSettings } from "@/lib/types";
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -125,12 +125,13 @@ export default function NotificationSettings({
         <h2 className="text-sm font-semibold">Focus mode default</h2>
         <select
           value={focusDefault}
-          onChange={(e) => setFocusDefault(e.target.value as "All" | "GSL" | "Explorers")}
+          onChange={(e) => setFocusDefault(e.target.value as FocusMode)}
           className="h-10 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm w-fit"
         >
           <option value="All">All</option>
           <option value="GSL">GSL</option>
           <option value="Explorers">Explorers</option>
+          <option value="Personal">Personal</option>
         </select>
       </div>
 
