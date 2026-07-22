@@ -4,9 +4,9 @@ import InlineCaptureBox from "@/components/InlineCaptureBox";
 import InboxItemGroup from "@/components/InboxItemGroup";
 import { useFocusMode } from "@/components/FocusModeContext";
 import { FOCUS_MODE_TO_ROLE_KEY } from "@/lib/constants";
-import type { InboxItem } from "@/lib/types";
+import type { InboxItem, Milestone } from "@/lib/types";
 
-export default function InboxView({ items }: { items: InboxItem[] }) {
+export default function InboxView({ items, milestones }: { items: InboxItem[]; milestones: Milestone[] }) {
   const { focusMode } = useFocusMode();
   const roleFilter = FOCUS_MODE_TO_ROLE_KEY[focusMode];
 
@@ -33,7 +33,7 @@ export default function InboxView({ items }: { items: InboxItem[] }) {
       ) : (
         <div className="flex flex-col gap-3">
           {visibleItems.map((item) => (
-            <InboxItemGroup key={item.id} item={item} roleFilter={roleFilter} />
+            <InboxItemGroup key={item.id} item={item} roleFilter={roleFilter} milestones={milestones} />
           ))}
         </div>
       )}

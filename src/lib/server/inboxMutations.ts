@@ -63,10 +63,15 @@ async function findMilestoneId(
 async function createActionFromProposalItem(
   supabase: Awaited<ReturnType<typeof createClient>>,
   item: AiProposalItem,
-  inboxItemId: string
+  inboxItemId: string,
+  explicitMilestoneId?: string | null
 ) {
   const milestone_id =
-    item.confidence === "high" ? await findMilestoneId(supabase, item.role_key, item.milestone_title_match) : null;
+    explicitMilestoneId !== undefined
+      ? explicitMilestoneId
+      : item.confidence === "high"
+        ? await findMilestoneId(supabase, item.role_key, item.milestone_title_match)
+        : null;
 
   const { data, error } = await supabase
     .from("actions")
@@ -124,7 +129,11 @@ async function removeProposalItem(
     .eq("id", inboxItemId);
 }
 
-export async function acceptProposalItem(inboxItemId: string, index: number, edited?: Partial<AiProposalItem>) {
+export async function acceptProposalItem(
+  inboxItemId: string,
+  index: number,
+  edited?: Partial<AiProposalItem> & { milestone_id?: string | null }
+) {
   const supabase = await createClient();
   const { data: item } = await supabase
     .from("inbox_items")
@@ -136,8 +145,9 @@ export async function acceptProposalItem(inboxItemId: string, index: number, edi
   const original = proposal?.items[index];
   if (!original) return { ok: false as const, error: "Proposal item not found" };
 
-  const merged: AiProposalItem = { ...original, ...edited };
-  const result = await createActionFromProposalItem(supabase, merged, inboxItemId);
+  const { milestone_id: explicitMilestoneId, ...editedFields } = edited ?? {};
+  const merged: AiProposalItem = { ...original, ...editedFields };
+  const result = await createActionFromProposalItem(supabase, merged, inboxItemId, explicitMilestoneId);
   if (!result.ok) return result;
 
   await removeProposalItem(supabase, inboxItemId, index);
