@@ -1,24 +1,23 @@
 # Scoutbase
 
 A personal action-management PWA for two concurrent Scouting volunteer
-roles (GSL and Explorers), built around ADHD-friendly capture, AI triage,
-and nudging. Single-user app — see `SCOUTBASE_SPEC.md` for the full brief.
+roles (GSL and Explorers), built around ADHD-friendly capture, automatic
+sorting, and nudging. Single-user app — see `SCOUTBASE_SPEC.md` for the
+full brief.
 
 This README covers everything needed to run it locally and take it live.
 
 ## Tech stack
 
 Next.js 15 (App Router, TypeScript) · Supabase (Postgres, Auth, RLS) ·
-Vercel (hosting + Cron) · Anthropic API (`claude-sonnet-4-6`, triage —
-**optional**, see below) · Web Push / VAPID (push notifications) · Serwist
+Vercel (hosting + Cron) · Web Push / VAPID (push notifications) · Serwist
 (PWA service worker).
 
-**AI triage is free by default.** No `ANTHROPIC_API_KEY` is required to run
-this app. When no real key is configured, triage runs on a deterministic,
-keyword-based heuristic (`src/lib/triageFallback.ts`) — no network call, no
-cost. If you ever add a real `ANTHROPIC_API_KEY`, triage transparently
-upgrades to calling real Claude instead; remove/blank the key to fall back
-to the free heuristic again at any time.
+**Capture sorting is free and runs entirely locally.** Brain-dump captures
+are pre-filled with best-guess fields via a deterministic, keyword-based
+parser (`src/lib/triageFallback.ts`) — no network call, no cost, no
+external API — and always land in the Inbox as an editable form so every
+field can be adjusted before anything is saved.
 
 **No email features.** Inbound email capture and the outbound daily digest
 email have both been removed. Nudges are push notifications (§8.2) plus the

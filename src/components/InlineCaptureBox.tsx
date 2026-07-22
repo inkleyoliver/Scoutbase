@@ -39,7 +39,7 @@ export default function InlineCaptureBox() {
           disabled={pending || !text.trim()}
           className="h-10 px-4 rounded-lg bg-[#4C1D95] text-white text-sm font-medium disabled:opacity-50"
         >
-          {pending ? "Triaging…" : "Capture"}
+          {pending ? "Sorting…" : "Capture"}
         </button>
       </div>
     </div>

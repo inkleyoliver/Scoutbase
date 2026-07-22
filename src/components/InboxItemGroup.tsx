@@ -10,14 +10,16 @@ import {
   dismissInboxItem,
   retryTriage,
 } from "@/lib/server/inboxMutations";
-import type { InboxItem, RoleKey } from "@/lib/types";
+import type { InboxItem, Milestone, RoleKey } from "@/lib/types";
 
 export default function InboxItemGroup({
   item,
   roleFilter = null,
+  milestones,
 }: {
   item: InboxItem;
   roleFilter?: RoleKey | null;
+  milestones: Milestone[];
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -72,12 +74,12 @@ export default function InboxItemGroup({
               }
               className="h-9 px-3 rounded-lg bg-[#4C1D95] text-white text-xs font-medium disabled:opacity-50"
             >
-              Accept all ({visibleIndexedItems.length})
+              Add all ({visibleIndexedItems.length})
             </button>
           </div>
           <div className="flex flex-col gap-2">
             {visibleIndexedItems.map(({ it, i }) => (
-              <ProposalCard key={`${item.id}-${i}`} inboxItemId={item.id} item={it} index={i} />
+              <ProposalCard key={`${item.id}-${i}`} inboxItemId={item.id} item={it} index={i} milestones={milestones} />
             ))}
           </div>
         </>
@@ -97,7 +99,7 @@ export default function InboxItemGroup({
       {!proposal && item.status === "pending" && (
         <div className="flex flex-col gap-3 rounded-lg border border-dashed border-[var(--border)] p-3">
           <p className="text-sm text-[var(--foreground-muted)]">
-            AI triage didn&apos;t return a usable result. Your capture is safe — retry, or file it manually.
+            Automatic sorting didn&apos;t return a usable result. Your capture is safe — retry, or file it manually.
           </p>
           <div className="flex flex-wrap gap-2">
             <button
@@ -110,7 +112,7 @@ export default function InboxItemGroup({
               }
               className="h-9 px-3 rounded-lg border border-[var(--border)] text-xs font-medium"
             >
-              Retry triage
+              Retry sorting
             </button>
           </div>
           <div className="flex flex-wrap items-center gap-2">

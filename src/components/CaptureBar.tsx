@@ -83,7 +83,7 @@ export default function CaptureBar() {
             onClick={(e) => e.stopPropagation()}
           >
             <p className="text-sm text-[var(--foreground-muted)]">
-              Brain dump. Type anything — the AI will sort it out.
+              Brain dump. Type anything — you&apos;ll get a chance to fill in the details before it&apos;s saved.
             </p>
             <textarea
               ref={textareaRef}

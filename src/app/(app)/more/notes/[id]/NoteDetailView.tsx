@@ -35,7 +35,7 @@ export default function NoteDetailView({ note }: { note: MeetingNote }) {
     setExtractMessage(
       result.triaged
         ? "Sent to Inbox for review — check the Inbox tab for proposed actions."
-        : "Sent to Inbox, but AI triage failed — you can convert it manually from the Inbox."
+        : "Sent to Inbox, but automatic sorting failed — you can convert it manually from the Inbox."
     );
   }
 
