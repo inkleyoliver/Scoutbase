@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 const REFERENCE_ITEMS = [
+  { href: "/more/calendar", label: "Calendar", icon: "📅", desc: "Agenda view of everything with a due date" },
   { href: "/more/contacts", label: "Contacts", icon: "👤", desc: "Trustees, DC, unit leaders — call/email links" },
   { href: "/more/notes", label: "Meeting notes", icon: "📝", desc: "Markdown notes, extract actions into the Inbox" },
   { href: "/more/decisions", label: "Decisions log", icon: "📋", desc: "Chronological record for structural reform" },

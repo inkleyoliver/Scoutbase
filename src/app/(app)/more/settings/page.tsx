@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import RecurringManager from "./RecurringManager";
 import NotificationSettings from "./NotificationSettings";
 import ExportButton from "./ExportButton";
+import CalendarFeedUrl from "./CalendarFeedUrl";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,11 @@ export default async function SettingsPage() {
     supabase.from("push_subscriptions").select("*").order("created_at", { ascending: true }),
     supabase.from("user_settings").select("*").maybeSingle(),
   ]);
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
+  const feedSecret = process.env.CALENDAR_FEED_SECRET;
+  const calendarFeedUrl =
+    appUrl && feedSecret && feedSecret !== "change-me" ? `${appUrl}/api/calendar.ics?token=${feedSecret}` : null;
 
   return (
     <div className="p-4 md:p-6 flex flex-col gap-6 max-w-xl">
@@ -27,6 +33,11 @@ export default async function SettingsPage() {
 
       <section className="border-t border-[var(--border)] pt-5">
         <NotificationSettings subscriptions={subscriptions ?? []} settings={settings ?? null} />
+      </section>
+
+      <section className="flex flex-col gap-2 border-t border-[var(--border)] pt-5">
+        <h2 className="text-sm font-semibold">Calendar feed</h2>
+        <CalendarFeedUrl url={calendarFeedUrl} />
       </section>
 
       <section className="flex flex-col gap-2 border-t border-[var(--border)] pt-5">

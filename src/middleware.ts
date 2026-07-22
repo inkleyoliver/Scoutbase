@@ -12,7 +12,9 @@ export const config = {
      * - _next/static, _next/image (static/optimisation assets)
      * - favicon.ico, manifest, icons
      * - api/cron routes that verify their own secret (CRON_SECRET)
+     * - api/calendar.ics, which calendar apps poll with no session cookie
+     *   and instead verifies its own token (CALENDAR_FEED_SECRET)
      */
-    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|icons|api/cron).*)",
+    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|icons|api/cron|api/calendar\\.ics).*)",
   ],
 };
