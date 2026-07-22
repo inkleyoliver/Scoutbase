@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import RoleChip from "@/components/RoleChip";
 import { extractActionsFromNote, updateMeetingNote } from "@/lib/server/referenceMutations";
+import { extractDocxNoteBody } from "@/lib/server/docxExtract";
 import type { MeetingNote } from "@/lib/types";
 
 export default function NoteDetailView({ note }: { note: MeetingNote }) {
@@ -14,6 +15,22 @@ export default function NoteDetailView({ note }: { note: MeetingNote }) {
   const [saving, setSaving] = useState(false);
   const [extracting, setExtracting] = useState(false);
   const [extractMessage, setExtractMessage] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  async function uploadDocx(file: File) {
+    setUploading(true);
+    setUploadError(null);
+    const formData = new FormData();
+    formData.set("file", file);
+    const result = await extractDocxNoteBody(formData);
+    setUploading(false);
+    if (!result.ok) {
+      setUploadError(result.error);
+      return;
+    }
+    setBody((prev) => (prev.trim() ? `${prev}\n\n${result.text}` : result.text));
+  }
 
   async function save() {
     setSaving(true);
@@ -74,6 +91,23 @@ export default function NoteDetailView({ note }: { note: MeetingNote }) {
 
       {editing ? (
         <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <label className="text-xs text-[var(--foreground-muted)] hover:text-[var(--foreground)] cursor-pointer">
+              {uploading ? "Reading…" : "Upload .docx"}
+              <input
+                type="file"
+                accept=".docx"
+                disabled={uploading}
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) uploadDocx(file);
+                  e.target.value = "";
+                }}
+              />
+            </label>
+          </div>
+          {uploadError && <p className="text-sm text-[var(--overdue)]">{uploadError}</p>}
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}

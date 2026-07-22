@@ -8,6 +8,7 @@ import RoleChip from "@/components/RoleChip";
 import { useFocusMode } from "@/components/FocusModeContext";
 import { FOCUS_MODE_TO_ROLE_KEY } from "@/lib/constants";
 import { createMeetingNote } from "@/lib/server/referenceMutations";
+import { extractDocxNoteBody } from "@/lib/server/docxExtract";
 import type { MeetingNote, RoleKey } from "@/lib/types";
 
 export default function NotesView({ notes }: { notes: MeetingNote[] }) {
@@ -64,6 +65,21 @@ function NewNoteForm({ defaultRole, onDone }: { defaultRole?: RoleKey; onDone: (
   const [body, setBody] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function uploadDocx(file: File) {
+    setUploading(true);
+    setError(null);
+    const formData = new FormData();
+    formData.set("file", file);
+    const result = await extractDocxNoteBody(formData);
+    setUploading(false);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+    setBody((prev) => (prev.trim() ? `${prev}\n\n${result.text}` : result.text));
+  }
 
   async function submit() {
     if (!title.trim()) {
@@ -113,7 +129,23 @@ function NewNoteForm({ defaultRole, onDone }: { defaultRole?: RoleKey; onDone: (
         <input value={attendees} onChange={(e) => setAttendees(e.target.value)} className="h-11 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 text-sm" />
       </div>
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium">Notes (markdown)</label>
+        <div className="flex items-center justify-between gap-2">
+          <label className="text-sm font-medium">Notes (markdown)</label>
+          <label className="text-xs text-[var(--foreground-muted)] hover:text-[var(--foreground)] cursor-pointer">
+            {uploading ? "Reading…" : "Upload .docx"}
+            <input
+              type="file"
+              accept=".docx"
+              disabled={uploading}
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) uploadDocx(file);
+                e.target.value = "";
+              }}
+            />
+          </label>
+        </div>
         <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={6} className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-3 text-sm resize-none font-mono" />
       </div>
       {error && <p className="text-sm text-[var(--overdue)]">{error}</p>}
