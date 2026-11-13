@@ -46,3 +46,9 @@ next-env.d.ts
 /public/sw.js.map
 /public/swe-worker-*.js
 /public/swe-worker-*.js.map
+
+.vercel
+.env*
+
+# Claude Code local permissions: can capture commands containing secrets
+.claude/settings.local.json
